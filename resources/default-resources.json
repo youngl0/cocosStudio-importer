@@ -1,0 +1,250 @@
+{
+  "source": "C:/Cocos Studio/EditorDefaultRes/Default",
+  "files": [
+    {
+      "path": "alpha.png",
+      "bytes": 2790,
+      "sha256": "14db7f862e75e11f1e4bdf9ab0f490340f67dffd1bc22d5e66587787e3f9d883"
+    },
+    {
+      "path": "arrowX.png",
+      "bytes": 1029,
+      "sha256": "cc12f9fc0939a533a9aed43cc1b973c46d99bff4b489aaf91613cc809819a188"
+    },
+    {
+      "path": "arrowY.png",
+      "bytes": 1040,
+      "sha256": "8bc1e4423ac8ce9193b7259543da44e183483f1ab3b54fa709902cc384a0ef4f"
+    },
+    {
+      "path": "arrowZ.png",
+      "bytes": 995,
+      "sha256": "3e7fdea625fa32c4828c14c8f03a24eced460aa3dd7a8024ef604ffbd827a05c"
+    },
+    {
+      "path": "Button_Disable.png",
+      "bytes": 1111,
+      "sha256": "60a8c220e4653b35d9ac57800b24cc0aae9e9365ddb846041aa15fc94b6102ae"
+    },
+    {
+      "path": "Button_Normal.png",
+      "bytes": 1113,
+      "sha256": "230bd3d925b9efb300065a914ad1bab770b09f7d691d1edbb10bb5b73cc3e34d"
+    },
+    {
+      "path": "Button_Press.png",
+      "bytes": 1153,
+      "sha256": "a2e9d9fc7e64c0134e340e293358d127f60845be9649f5f5f8769094a4ae406a"
+    },
+    {
+      "path": "camera.c3b",
+      "bytes": 9972,
+      "sha256": "50d815132a1b7a852607b694db1db66086e8d238a579706edcc423e75a6dc3b5"
+    },
+    {
+      "path": "CheckBoxNode_Disable.png",
+      "bytes": 1231,
+      "sha256": "ff553d6a84eba7acd729d4f3b5cdafbfddac4dd861eb5e27e22b0835bd3e633e"
+    },
+    {
+      "path": "CheckBoxNode_Normal.png",
+      "bytes": 1241,
+      "sha256": "977923cc9750da2f759de4f9b6b4cbd8cbafdadcf65565cf7bb6c6ee97963de4"
+    },
+    {
+      "path": "CheckBox_Disable.png",
+      "bytes": 1204,
+      "sha256": "a4491e74b22286a4d36914de5e223418b49da94e3db935a6cb867eb20a694333"
+    },
+    {
+      "path": "CheckBox_Normal.png",
+      "bytes": 1204,
+      "sha256": "739b68458dc5b6494f71ece936e19d91be652b4f7b5dff069110198d99ed38f9"
+    },
+    {
+      "path": "CheckBox_Press.png",
+      "bytes": 1243,
+      "sha256": "0b1bde235e495d98b30e43e8d174d6cb2fb1e6a70d19c44fbab143ca86435051"
+    },
+    {
+      "path": "common.ttf",
+      "bytes": 8555232,
+      "sha256": "4c04f19966776e19899272643247c2697d24353bb64322078018ee626f473f91"
+    },
+    {
+      "path": "defaultBMFont.fnt",
+      "bytes": 29191,
+      "sha256": "f9e463dfef9e1d48fe4b3836a78b85fdac08a72bd3535172882136b1c838df8f"
+    },
+    {
+      "path": "defaultBMFont.png",
+      "bytes": 114177,
+      "sha256": "85e42a6ee9429919f9943cef8e4c2285b0bdd46ac202f02548a312db9072197e"
+    },
+    {
+      "path": "defaultMap.png",
+      "bytes": 17233,
+      "sha256": "1d2c22eaf2b32a4e5df6238a5a131232b77f26e1ed35bc993b48d66062c463a5"
+    },
+    {
+      "path": "defaultMap.tmx",
+      "bytes": 422,
+      "sha256": "99c5aaadfea80cb8bad7c22b17aee52a793179c01fd9e725d93214634c96b500"
+    },
+    {
+      "path": "defaultParticle.plist",
+      "bytes": 8129,
+      "sha256": "fb1529cf5bdf0463df377519fd33e1da6b70dfa98b463efef02e8ecc53c6d4bf"
+    },
+    {
+      "path": "DemoPlayer.ExportJson",
+      "bytes": 45507,
+      "sha256": "6fe63042f6f31ab6f4986b44898fcd1392e6882615e8e235e2fe8ff7adc52ef3"
+    },
+    {
+      "path": "DemoPlayer0.plist",
+      "bytes": 4530,
+      "sha256": "3d687101ec613a7d8274ab04065bbcccc9f806004bcf134912d037312e4de1ea"
+    },
+    {
+      "path": "DemoPlayer0.png",
+      "bytes": 13318,
+      "sha256": "b9bd895222ced0ca825115c7764a40f85262a229c58ae614c0157906154986ed"
+    },
+    {
+      "path": "empty.c3t",
+      "bytes": 4195,
+      "sha256": "196db71dfe770a2191f5fb1ef2b8d542f34ed22a0fd819fee22273494d4e0a0d"
+    },
+    {
+      "path": "ImageFile.png",
+      "bytes": 1735,
+      "sha256": "9268e2dadddebbb051acb3ab9f78789b1cd2046fab1b09d28cfc7becd175b8d8"
+    },
+    {
+      "path": "Light_Ambint.png",
+      "bytes": 1274,
+      "sha256": "be6095ecbd023c36b500f94cd68f17947b43b1e7ccd725d146a1fcdec8a3288d"
+    },
+    {
+      "path": "Light_Directional.png",
+      "bytes": 1138,
+      "sha256": "525b3804a72f5907dbca847f197705dd20849d12ee3d9770ef99a3ead4e180fe"
+    },
+    {
+      "path": "Light_Point.png",
+      "bytes": 1354,
+      "sha256": "b25c2beed4c09bdb0d19675365311b96c0accdcd1159757b5ed2890d1b2cb483"
+    },
+    {
+      "path": "Light_Spot.png",
+      "bytes": 1254,
+      "sha256": "8fe5e56ae1fac83d286cfa85ed2c70062c8e47561f9a03c3296c1ba3380d03d4"
+    },
+    {
+      "path": "LoadingBarFile.png",
+      "bytes": 1115,
+      "sha256": "e828ca45366a90a8c390a9f2c2df5f77d29ca81cabb073f25fff2e89af19724e"
+    },
+    {
+      "path": "materials/default.material",
+      "bytes": 298,
+      "sha256": "ddb37d7ebee26df14d4061ba4e6e042ad0fedb646a1ca436efe04930f8e6e301"
+    },
+    {
+      "path": "missing-font.fnt",
+      "bytes": 25098,
+      "sha256": "e946cde07beedf424221cdb22ec5f5eb0cbdc963fa22213d25f0eb5e01dc68ef"
+    },
+    {
+      "path": "missing-font.png",
+      "bytes": 110840,
+      "sha256": "02fdf84b8ac59017a443df2f6fc30c29cc4e4ba3b52069fcabe649bc361e426a"
+    },
+    {
+      "path": "missing.png",
+      "bytes": 8574,
+      "sha256": "39646df8ab9a345eee4ba9b1e287d476e132c86f39ede1ad7e3a8e2e1ac76105"
+    },
+    {
+      "path": "scripts/default.pu",
+      "bytes": 724,
+      "sha256": "d38607b34c71f72ec7226f8d18640d482b0e53e34a9ee36f7bc933f48cd14aed"
+    },
+    {
+      "path": "skeleton.png",
+      "bytes": 1546,
+      "sha256": "00a98b07ce3a4356de8b2531855f5e7e4d01180a7373ff6878ab255b5cfac300"
+    },
+    {
+      "path": "skeleton@2x.png",
+      "bytes": 2179,
+      "sha256": "0d38d3c24db0b0bc04b5ca1416f4c5321010af58315cffcf18ae5cb18ceedf29"
+    },
+    {
+      "path": "skybox.png",
+      "bytes": 2878,
+      "sha256": "1089b432fc34eada587757a83a80f3f72ca4beb9dabf3299f33c1a1de53158d5"
+    },
+    {
+      "path": "Slice3D.png",
+      "bytes": 1773,
+      "sha256": "a40c26d13dc5604843b85f14177d66bd9a3423e4f481f9d11c8b0a78d0064296"
+    },
+    {
+      "path": "SliderNode_Disable.png",
+      "bytes": 1675,
+      "sha256": "4f744db6b8f7cb61d079f621ce08c463ac964b55f5dcd5771c9f52f38eab57d0"
+    },
+    {
+      "path": "SliderNode_Normal.png",
+      "bytes": 1678,
+      "sha256": "5214f51bd05fc69e0e6033f0b230ca0bad1aa04c1bf745132dc651e758aaec3b"
+    },
+    {
+      "path": "SliderNode_Press.png",
+      "bytes": 1567,
+      "sha256": "7b312468c190a36756c64da4dc6e596953884a920deed30628db7c9295ff1c84"
+    },
+    {
+      "path": "Slider_Back.png",
+      "bytes": 1166,
+      "sha256": "5528225e5909fac979435219d4c9ab37db49d08dcf1a788444ff7baa56491b2c"
+    },
+    {
+      "path": "Slider_PressBar.png",
+      "bytes": 1087,
+      "sha256": "a9d341bc3cd2d3e8e13b1e838ecd4498f87ec80b3fd93185e4bc8f8115d29ad4"
+    },
+    {
+      "path": "Sprite.png",
+      "bytes": 1773,
+      "sha256": "a40c26d13dc5604843b85f14177d66bd9a3423e4f481f9d11c8b0a78d0064296"
+    },
+    {
+      "path": "Sprite3D.png",
+      "bytes": 1773,
+      "sha256": "a40c26d13dc5604843b85f14177d66bd9a3423e4f481f9d11c8b0a78d0064296"
+    },
+    {
+      "path": "TextAtlas.png",
+      "bytes": 3121,
+      "sha256": "d78f4010f642ceee554e266f2abdee54f536108bdf4e62183fe401d4bb9bad55"
+    },
+    {
+      "path": "textures/default.png",
+      "bytes": 29900,
+      "sha256": "371c6753e36bfbbe7888bf0ad53d446bd83e5177bbe112e3c807d0422a75822f"
+    },
+    {
+      "path": "title.ttf",
+      "bytes": 4646020,
+      "sha256": "f8deb9157977e7534799abec734e9a95822ccea16366246c592cf02c429256cf"
+    },
+    {
+      "path": "white.png",
+      "bytes": 119,
+      "sha256": "603506996b902b8797cbc1dc4bf350440caad5c59feb97c39344fd7648403b5d"
+    }
+  ]
+}

@@ -1,0 +1,27 @@
+name: Publish release
+on:
+  push:
+    tags: ['v*']
+permissions:
+  contents: read
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 24
+      - run: npm test
+      - run: npm run release
+      - name: Publish verified extension ZIP
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.ref_name }}
+        run: >-
+          gh release create "$RELEASE_TAG"
+          dist/cocos-studio-importer-*.zip dist/SHA256SUMS.txt
+          --verify-tag --title "$RELEASE_TAG"
+          --notes-file dist/RELEASE_NOTES.md --latest

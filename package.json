@@ -1,0 +1,91 @@
+{
+  "name": "cocos-studio-importer",
+  "version": "0.3.0",
+  "package_version": 2,
+  "description": "独立 Cocos Studio → Creator 3.8 转换器",
+  "author": "Local Tools",
+  "main": "./main.js",
+  "scripts": {
+    "test": "node --test test/direct.test.js test/updater.test.js",
+    "check": "node cli.js --help",
+    "package": "node cli.js package",
+    "release": "node scripts/release.js",
+    "check-release": "node scripts/release.js --check"
+  },
+  "panels": {
+    "default": {
+      "title": "Cocos Studio 导入",
+      "main": "./panel.js",
+      "size": {
+        "width": 700,
+        "height": 680,
+        "min-width": 550,
+        "min-height": 480
+      }
+    }
+  },
+  "contributions": {
+    "menu": [
+      {
+        "path": "i18n:menu.file",
+        "label": "导入 Cocos Studio 工程",
+        "message": "open"
+      }
+    ],
+    "messages": {
+      "open": {
+        "methods": [
+          "open"
+        ]
+      },
+      "scan": {
+        "methods": [
+          "scan"
+        ]
+      },
+      "start": {
+        "methods": [
+          "start"
+        ]
+      },
+      "status": {
+        "methods": [
+          "status"
+        ]
+      },
+      "defaults": {
+        "methods": [
+          "defaults"
+        ]
+      },
+      "update-status": {
+        "methods": [
+          "update-status"
+        ]
+      },
+      "check-update": {
+        "methods": [
+          "check-update"
+        ]
+      },
+      "install-update": {
+        "methods": [
+          "install-update"
+        ]
+      }
+    }
+  },
+  "title": "Cocos Studio 导入器",
+  "editor": ">=3.8.2 <3.9.0",
+  "engines": {
+    "node": ">=18"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/youngl0/cocosStudio-importer.git"
+  },
+  "homepage": "https://github.com/youngl0/cocosStudio-importer#readme",
+  "bugs": {
+    "url": "https://github.com/youngl0/cocosStudio-importer/issues"
+  }
+}

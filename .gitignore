@@ -1,0 +1,11 @@
+.work/
+node_modules/
+*.zip
+dist/
+reports/
+bridge-2x/
+.DS_Store
+Thumbs.db
+.env
+.env.*
+!.env.example
