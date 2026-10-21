@@ -68,6 +68,8 @@ test('bundled defaults generate sprite frames and copy only referenced files',t=
  assert.equal(r.defaultResources.length,3);assert.equal(r.images.length,3);assert.deepEqual(r.dependencyErrors,[]);
  for(const tag of ['_normalSprite','_pressedSprite','_disabledSprite'])assert.ok(button[tag].__uuid__);
  for(const item of r.defaultResources)assert.deepEqual(fs.readFileSync(item.file),fs.readFileSync(path.join(defaultRoot,item.source.slice(8))));
+ for(const image of r.images){assert.equal(image.file,r.defaultResources.find(item=>item.source===image.source).file);assert.ok(image.file.includes(path.join('resources','studio-default','Default')));}
+ assert.equal(fs.existsSync(path.join(f.output,'assets/studio/frames/default')),false);
  assert.equal(fs.existsSync(path.join(f.output,'assets/studio/resources/studio-default/Default/common.ttf')),false);
  assert.equal(r.warnings.some(w=>w.reason.includes('内置图片')),false);
 });

@@ -1,4 +1,4 @@
-# Cocos Studio → Creator 3.8 独立导入器 0.4.1
+# Cocos Studio → Creator 3.8 独立导入器 0.4.2
 
 直接读取 .ccs / .csd / 图片，生成 Creator 3.8 原生 Prefab 和 .meta。转换核心用 Node.js 编写；XML 解析器 @xmldom/xmldom 0.9.12 以未修改的源码附带在 vendor/xmldom，保留 MIT 许可证；运行时无 npm 依赖。另内置用户提供的 Cocos Studio Default 原始资源。
 
@@ -26,7 +26,7 @@
 
 ## 作为 Creator 3.8 扩展使用
 
-1. 在扩展管理器中选择「项目」，导入 dist/cocos-studio-importer-0.4.1.zip。ZIP 根目录直接包含 package.json。
+1. 在扩展管理器中选择「项目」，导入 dist/cocos-studio-importer-0.4.2.zip。ZIP 根目录直接包含 package.json。
 2. 如果已经安装旧版本，替换同名扩展并重新加载，然后确认已启用。
 3. 在「文件 → 导入 Cocos Studio 工程」打开面板。
 4. 选择 .ccs，扫描并勾选需要的 CSD，点击「导入所选界面」。
@@ -72,7 +72,7 @@ CSD 名称可连续指定多个；省略则处理 CCS 登记的全部 CSD。嵌�
 
 - Type="Default" 的引用从内置库读取，支持 Default/Sprite.png、反斜杠路径及 Sprite.png 短路径。
 - 普通引用优先读取工程资源；只有工程中不存在的 Default/... 路径才回退到内置库。来源保持区分；只有内容和导入设置完全相同时才会复用已有资源。
-- 转换前扫描默认资源依赖，按需复制到输出的 resources/studio-default/Default；不会把整个默认库放进目标工程。图片帧继续按帧/边距组合生成在 frames 下。
+- 转换前扫描默认资源依赖，按需复制到输出的 resources/studio-default/Default；不会把整个默认库放进目标工程。0.4.2 起，普通默认图片直接在此文件上生成纹理和 SpriteFrame 元数据，不再额外复制到 frames/default/images/Default。
 - 自动包含 FNT 图片页、plist 纹理、TMX/TSX 图片及 ExportJson 声明的图集/图片依赖；带嵌入纹理的粒子 plist 不要求额外纹理文件。
 - 默认图片进入正常 Sprite / Button / Toggle 转换，TTF/OTF 可用于 Label。不存在的默认引用会报告 CSD 来源并停止转换。
 - 报告 defaultResources 字段列出复制的默认资源，images.origin 标识 default / project / generated。
@@ -81,13 +81,15 @@ CSD 名称可连续指定多个；省略则处理 CCS 登记的全部 CSD。嵌�
 
 0.4.0 起可指定目标目录并复用已有资源，规则见下节；发生复用时，保留已有文件的路径和 UUID。
 
-普通图片保留源文件名与相对目录。例如 gImage3/global_panel5_panelbg.png 输出到 frames/project/images/gImage3/global_panel5_panelbg.png。默认资源放在 frames/default/images/Default，工具生成的图片放在 frames/generated/images，避免与工程图片冲突。
+普通图片保留源文件名与相对目录。例如 gImage3/global_panel5_panelbg.png 输出到 frames/project/images/gImage3/global_panel5_panelbg.png。普通默认图片统一放在 resources/studio-default/Default，纯色背景图片放在 generated/white.png；其 SpriteFrame 由同一图片的 .meta 提供。图集裁切帧仍输出到 frames/来源/atlases 下。
 
 相同图片、相同帧和相同九宫格参数复用同一文件。首次出现的参数组合使用原名；后续不同参数组合使用「原名__8位标识.png」，例如 button__a1b2c3d4.png。遇到已有同名文件会继续区分，不覆盖。首次参数组合由所选界面的遍历顺序决定。
 
 图集图片以帧名命名，放在 frames/来源/atlases/图集相对路径/帧名 下；实际文件仍是图集纹理副本，由 .meta 指定裁切区域。扩展名与实际纹理格式一致。不适合 Windows 文件名的图集帧字符会替换并写入报告。
 
 新版命名仅对重新导入生效，原导入目录不改名；报告 images 记录源图片、输出路径和 UUID 的对应关系。
+
+0.4.2 消除普通默认图片的原始副本与帧副本重复。不同裁切、九宫格参数仍需要独立变体，不保证所有同字节图片都合并。升级不会自动删除旧版已生成的副本或改变旧 Prefab 的引用；在新目录重新导入可得到精简后的结构。
 
 ## 指定目录与资源复用（0.4.0）
 

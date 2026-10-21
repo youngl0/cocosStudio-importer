@@ -45,3 +45,26 @@ test('output directory links and nested junctions cannot write outside the chose
 test('changed raw resources and orphaned meta names remain intact',t=>{
  const f=fixture(t);fs.mkdirSync(f.output,{recursive:true});fs.writeFileSync(path.join(f.output,'font.ttf'),'original');fs.writeFileSync(path.join(f.output,'new.ttf.meta'),JSON.stringify({uuid:crypto.randomUUID()}));const before=snapshot(f.output),store=new OutputStore(f.output);const one=store.save('font.ttf',Buffer.from('new'));assert.notEqual(path.basename(one.file),'font.ttf');const two=store.save('new.ttf',Buffer.from('another'));assert.notEqual(path.basename(two.file),'new.ttf');unchanged(f.output,before);
 });
+
+test('plain defaults share their preserved files with sprite frames and keep one copy across imports',t=>{
+ const f=fixture(t,'<GameFile><ObjectData ctype="ImageViewObjectData"><FileData Type="Default" Path="Default/ImageFile.png"/><Children><AbstractNodeData ctype="ButtonObjectData"><NormalFileData Type="Default" Path="Default/Button_Disable.png"/></AbstractNodeData></Children></ObjectData></GameFile>');
+ const first=f.run();assert.equal(first.images.length,2);for(const image of first.images)assert.equal(image.file,first.defaultResources.find(r=>r.source===image.source).file);assert.equal(fs.existsSync(path.join(f.output,'frames/default')),false);
+ const files=Object.keys(snapshot(f.output)).filter(p=>/\.png$/.test(p));assert.equal(files.length,2);const before=snapshot(f.output),second=f.run();assert.equal(second.createdResources,0);assert.equal(second.reusedResources,3);assert.equal(second.prefabs[0].uuid,first.prefabs[0].uuid);for(let i=0;i<first.images.length;i++)assert.equal(second.images[i].spriteFrameUuid,first.images[i].spriteFrameUuid);unchanged(f.output,before);
+});
+
+test('different default nine-slice settings create only the necessary variants, without a third raw copy',t=>{
+ const f=fixture(t,'<GameFile><ObjectData ctype="ImageViewObjectData"><FileData Type="Default" Path="Default/ImageFile.png"/><Children><AbstractNodeData ctype="ImageViewObjectData" Scale9Enable="True" Scale9OriginX="1" Scale9OriginY="1" Scale9Width="8" Scale9Height="8"><FileData Type="Default" Path="Default/ImageFile.png"/></AbstractNodeData></Children></ObjectData></GameFile>');
+ const r=f.run();assert.equal(r.images.length,2);assert.notEqual(r.images[0].spriteFrameUuid,r.images[1].spriteFrameUuid);assert.equal(Object.keys(snapshot(f.output)).filter(p=>/\.png$/.test(p)).length,2);assert.equal(r.defaultResources[0].file,r.images[0].file);assert.equal(fs.existsSync(path.join(f.output,'frames/default')),false);assert.equal(f.run().createdResources,0);
+});
+
+test('a conflicting default filename keeps the old file and promotes one new copy to an image resource',t=>{
+ const f=fixture(t,'<GameFile><ObjectData ctype="ImageViewObjectData"><FileData Type="Default" Path="Default/ImageFile.png"/></ObjectData></GameFile>'),existing=path.join(f.output,'resources/studio-default/Default/ImageFile.png');fs.mkdirSync(path.dirname(existing),{recursive:true});fs.writeFileSync(existing,'user file');const before=snapshot(f.output),r=f.run();assert.notEqual(r.images[0].file,existing);assert.equal(r.images[0].file,r.defaultResources[0].file);assert.equal(Object.keys(snapshot(f.output)).filter(p=>/\.png$/.test(p)).length,2);assert.equal(fs.existsSync(existing+'.meta'),false);unchanged(f.output,before);assert.equal(f.run().createdResources,0);
+});
+
+test('a conflicting default font filename does not create separate raw and font copies',t=>{
+ const f=fixture(t,'<GameFile><ObjectData ctype="TextObjectData" LabelText="font"><FontResource Type="Default" Path="Default/common.ttf"/></ObjectData></GameFile>'),existing=path.join(f.output,'resources/studio-default/Default/common.ttf');fs.mkdirSync(path.dirname(existing),{recursive:true});fs.writeFileSync(existing,'user font');const before=snapshot(f.output),r=f.run();assert.equal(Object.keys(snapshot(f.output)).filter(p=>/\.ttf$/.test(p)).length,2);assert.ok(fs.existsSync(r.defaultResources[0].file+'.meta'));unchanged(f.output,before);assert.equal(f.run().createdResources,0);
+});
+
+test('generated solid backgrounds attach frame metadata to their single white image',t=>{
+ const f=fixture(t,'<GameFile><ObjectData ctype="PanelObjectData" ComboBoxIndex="1"><Size X="100" Y="80"/><SingleColor R="20" G="30" B="40"/></ObjectData></GameFile>'),r=f.run();assert.equal(r.images.length,1);assert.equal(r.images[0].file,path.join(f.output,'generated/white.png'));assert.equal(Object.keys(snapshot(f.output)).filter(p=>/\.png$/.test(p)).length,1);assert.equal(f.run().createdResources,0);
+});

@@ -62,7 +62,7 @@ node cli.js assets "D:\StudioProject\demo.ccs" "F:\MyCreatorProject\assets\studi
 | `resources` | 每个资源的输出 file、类型、UUID 及 reused 标记 |
 | `createdResources/reusedResources` | 本次新增/复用的不同资源文件数，不含报告与 .meta 文件计数 |
 | `images` | 源路径、origin、输出图片、SpriteFrame UUID、裁切与边距；没有图片时可能不出现 |
-| `defaultResources` | 按需复制的默认文件 |
+| `defaultResources` | 按需复制的默认文件；0.4.2 起普通默认图片与 images 对应项共用同一个文件，由 .meta 提供 SpriteFrame |
 | `spriteFrames` | 成功转换的帧数 |
 | `dependencyErrors` | 序列化对象或资源 UUID 引用检查结果 |
 | `error` | 转换阶段失败时的错误堆栈 |

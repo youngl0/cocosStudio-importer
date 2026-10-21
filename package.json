@@ -1,6 +1,6 @@
 {
   "name": "cocos-studio-importer",
-  "version": "0.4.1",
+  "version": "0.4.2",
   "package_version": 2,
   "description": "独立 Cocos Studio → Creator 3.8 转换器",
   "author": "Local Tools",

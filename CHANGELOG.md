@@ -1,5 +1,12 @@
 # 更新记录
 
+## 0.4.2
+
+- 修复普通 Cocos Studio 默认图片被复制到 resources/studio-default/Default 与 frames/default/images/Default 两处的问题；同一图片直接在保留文件上生成纹理和 SpriteFrame 元数据。
+- 默认图片和字体遇到同名文件冲突时，使用实际另存路径继续生成元数据，避免再复制一份。
+- 工具生成的纯色背景共用单个 generated/white.png。不同裁切、九宫格或纹理设置仍保留必要变体。
+- 升级不会删除已有资源或修改旧引用；可在新目录重新导入以得到精简后的目录。
+
 ## 0.4.1
 
 - 更新检查优先读取 GitHub Release 的 update.json，避免匿名 REST API 限流阻断检查；旧 Release 无此文件时才回退 API。
