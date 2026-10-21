@@ -15,7 +15,7 @@ exports.methods={
   if(updateBusy)throw new Error('已有更新任务正在执行');
   if(updateState.phase==='restart-required')return updateState;
   updateBusy=true;release=null;updateState={...updateState,phase:'checking',available:false,message:'正在检查 GitHub Release',error:null};
-  try{release=await updater.check({repo:updateState.repo,current:manifest.version});updateState={...updateState,available:release.available,phase:release.available?'available':'up-to-date',latest:release.latest,notes:release.notes,releaseUrl:release.releaseUrl,message:release.available?'发现新版本 '+release.latest:'当前已是最新稳定版'};}
+  try{release=await updater.check({repo:updateState.repo,current:manifest.version});updateState={...updateState,source:release.source,available:release.available,phase:release.available?'available':'up-to-date',latest:release.latest,notes:release.notes,releaseUrl:release.releaseUrl,message:release.available?'发现新版本 '+release.latest:'当前已是最新稳定版'};}
   catch(e){updateState={...updateState,phase:'failed',error:e.message,message:'检查更新失败'};}finally{updateBusy=false;}
   return updateState;
  },

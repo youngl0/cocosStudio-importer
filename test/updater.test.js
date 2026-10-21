@@ -20,7 +20,7 @@ test('repository parser and numeric stable-version comparisons reject invalid ta
 });
 test('check resolves exact release ZIP and checksums and does not downgrade',async()=>{
  const payload={tag_name:'v0.3.1',body:'Fixes',assets:[{name:name+'-0.3.1.zip',browser_download_url:`https://github.com/${repo}/releases/download/v0.3.1/${name}-0.3.1.zip`},{name:'SHA256SUMS.txt',browser_download_url:`https://github.com/${repo}/releases/download/v0.3.1/SHA256SUMS.txt`}]};
- const fetch=async url=>{assert.equal(url,`https://api.github.com/repos/${repo}/releases/latest`);return Buffer.from(JSON.stringify(payload));};
+ const fetch=async url=>{if(url.endsWith('/download/update.json'))throw Object.assign(new Error('No feed in legacy release'),{statusCode:404});assert.equal(url,`https://api.github.com/repos/${repo}/releases/latest`);return Buffer.from(JSON.stringify(payload));};
  assert.equal((await updater.check({repo,current:'0.3.0',fetch})).available,true);assert.equal((await updater.check({repo,current:'0.3.1',fetch})).available,false);assert.equal((await updater.check({repo,current:'0.4.0',fetch})).available,false);
  payload.assets[0].browser_download_url='https://example.com/update.zip';await assert.rejects(updater.check({repo,current:'0.3.0',fetch}),/缺少/);
  payload.prerelease=true;await assert.rejects(updater.check({repo,current:'0.3.0',fetch}),/稳定版/);
@@ -53,4 +53,29 @@ test('development directories and downgrades are blocked before download',async 
 });
 test('network fetch rejects arbitrary hosts and non-HTTPS URLs',async()=>{
  for(const url of ['http://github.com/a','https://example.com/a','https://github.com:444/a','https://user:secret@github.com/a'])await assert.rejects(updater.request(url),/不受支持/);
+});
+
+test('release feed checks updates while the anonymous GitHub API is rate limited',async()=>{
+ const feed={schema:1,name,version:'0.4.1',tag:'v0.4.1',asset:name+'-0.4.1.zip',sha256:'a'.repeat(64),notes:'Fix API rate limits'},calls=[];
+ const fetch=async url=>{calls.push(url);if(url.startsWith('https://api.github.com/'))throw Object.assign(new Error('API rate limited'),{statusCode:403});assert.equal(url,`https://github.com/${repo}/releases/latest/download/update.json`);return Buffer.from(JSON.stringify(feed));};
+ const result=await updater.check({repo,current:'0.4.0',fetch});assert.equal(result.source,'release-asset');assert.equal(result.available,true);assert.equal(result.latest,'0.4.1');assert.equal(result.expectedSha256,'a'.repeat(64));assert.equal(calls.length,1);assert.equal(result.asset.url,`https://github.com/${repo}/releases/download/v0.4.1/${name}-0.4.1.zip`);
+});
+test('feed checks recognize the current release and never offer a downgrade',async()=>{
+ const feed={schema:1,name,version:'0.4.1',tag:'v0.4.1',asset:name+'-0.4.1.zip',sha256:'a'.repeat(64)},fetch=async()=>Buffer.from(JSON.stringify(feed));
+ assert.equal((await updater.check({repo,current:'0.4.1',fetch})).available,false);assert.equal((await updater.check({repo,current:'0.5.0',fetch})).available,false);
+});
+test('invalid release feed fails closed instead of trusting URLs or a different package',async()=>{
+ const feed={schema:1,name,version:'0.4.1',tag:'v0.4.1',asset:name+'-0.4.1.zip',sha256:'a'.repeat(64)};
+ for(const changes of [{name:'other-extension'},{version:'0.4.1-beta.1'},{tag:'../other'},{asset:'https://example.com/update.zip'},{sha256:'invalid'},{schema:2}]){let calls=0;await assert.rejects(updater.check({repo,current:'0.4.0',fetch:async()=>{calls++;return Buffer.from(JSON.stringify({...feed,...changes}));}}));assert.equal(calls,1);}
+ await assert.rejects(updater.check({repo,current:'0.4.0',fetch:async()=>Buffer.from('null')}),/无效/);
+});
+test('unreachable feed falls back once to the legacy API and preserves the network error',async()=>{
+ const calls=[];await assert.rejects(updater.check({repo,current:'0.4.0',fetch:async url=>{calls.push(url);throw Object.assign(new Error(url.includes('api.github.com')?'GitHub API rate limited':'Feed not available'),{statusCode:url.includes('api.github.com')?403:404});}}),/API rate limited/);assert.equal(calls.length,2);
+});
+test('release build metadata is consumable by the updater and pins the ZIP SHA-256',async t=>{
+ const f=bundle(t),pkg={name,version:'0.3.1',editor:'>=3.8.2 <3.9.0'},hash=crypto.createHash('sha256').update(f.data).digest('hex'),feed=require('../scripts/release').updateManifest(pkg,hash,'Release notes');
+ const result=await updater.check({repo,current:'0.3.0',fetch:async()=>Buffer.from(JSON.stringify(feed))});assert.equal(result.expectedSha256,hash);assert.equal(result.notes,'Release notes');assert.equal(result.asset.name,f.release.asset.name);const installed=await updater.install({...f.options,release:result});assert.equal(installed.phase,'restart-required');
+});
+test('feed hash disagreement aborts installation before touching the existing extension',async t=>{
+ const f=bundle(t);await assert.rejects(updater.install({...f.options,release:{...f.release,expectedSha256:'0'.repeat(64)}}),/update.json/);assert.equal(fs.readFileSync(path.join(f.root,'old.txt'),'utf8'),'keep old version');
 });

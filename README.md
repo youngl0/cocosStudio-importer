@@ -1,4 +1,4 @@
-# Cocos Studio → Creator 3.8 独立导入器 0.4.0
+# Cocos Studio → Creator 3.8 独立导入器 0.4.1
 
 直接读取 .ccs / .csd / 图片，生成 Creator 3.8 原生 Prefab 和 .meta。转换核心用 Node.js 编写；XML 解析器 @xmldom/xmldom 0.9.12 以未修改的源码附带在 vendor/xmldom，保留 MIT 许可证；运行时无 npm 依赖。另内置用户提供的 Cocos Studio Default 原始资源。
 
@@ -26,7 +26,7 @@
 
 ## 作为 Creator 3.8 扩展使用
 
-1. 在扩展管理器中选择「项目」，导入 dist/cocos-studio-importer-0.4.0.zip。ZIP 根目录直接包含 package.json。
+1. 在扩展管理器中选择「项目」，导入 dist/cocos-studio-importer-0.4.1.zip。ZIP 根目录直接包含 package.json。
 2. 如果已经安装旧版本，替换同名扩展并重新加载，然后确认已启用。
 3. 在「文件 → 导入 Cocos Studio 工程」打开面板。
 4. 选择 .ccs，扫描并勾选需要的 CSD，点击「导入所选界面」。
@@ -37,6 +37,8 @@
 ## 编辑器内更新
 
 从 [GitHub Releases](https://github.com/youngl0/cocosStudio-importer/releases) 首次安装 0.3.0 或更新版本后，可在导入面板底部点击「检查更新」和「下载并安装更新」。旧版会自动备份，安装完成后请在扩展管理器重新加载本扩展。无需安装 Git；离线导入能力保留。详见 [发布与更新说明](docs/PUBLISHING.md)。
+
+0.4.1 起优先读取 Release 附带的版本信息文件，避免检查更新受 GitHub 匿名 API 额度影响。如果旧版已显示「GitHub 请求受限」，请从发布页手动安装一次 0.4.1 或更新版并重新加载。
 
 ## 安装异常处理
 

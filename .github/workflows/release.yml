@@ -22,6 +22,6 @@ jobs:
           RELEASE_TAG: ${{ github.ref_name }}
         run: >-
           gh release create "$RELEASE_TAG"
-          dist/cocos-studio-importer-*.zip dist/SHA256SUMS.txt
+          dist/cocos-studio-importer-*.zip dist/SHA256SUMS.txt dist/update.json
           --verify-tag --title "$RELEASE_TAG"
           --notes-file dist/RELEASE_NOTES.md --latest
