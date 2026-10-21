@@ -1,6 +1,6 @@
 # Creator 3.8 扩展开发说明
 
-适用版本：扩展 0.3.0，目标 Creator 3.8.2–3.8.x；实际编辑器验证版本为 Windows Creator 3.8.8。其他 3.8 补丁版本尚未逐一验证。本项目直接分发 CommonJS JavaScript，不需要 TypeScript 编译。
+适用版本：扩展 0.4.0，目标 Creator 3.8.2–3.8.x；实际编辑器验证版本为 Windows Creator 3.8.8。其他 3.8 补丁版本尚未逐一验证。本项目直接分发 CommonJS JavaScript，不需要 TypeScript 编译。
 
 ## 扩展定义与入口
 
@@ -10,7 +10,7 @@ Creator 通过 `package.json` 识别扩展的入口、面板和贡献功能。�
 | --- | --- | --- |
 | `name` | `cocos-studio-importer` | 扩展标识；安装目录使用同名 |
 | `package_version` | `2` | 保持 Creator 扩展包格式设置，不随补丁版本增加 |
-| `version` | `0.3.0` | 本工具发布版本 |
+| `version` | `0.4.0` | 本工具发布版本 |
 | `title` | `Cocos Studio 导入器` | 扩展管理器显示名称 |
 | `description` / `author` | 见根目录清单 | 功能描述与作者信息 |
 | `editor` | `>=3.8.2 <3.9.0` | 限定目标编辑器版本范围；不代表所有补丁版本已测试 |
@@ -35,6 +35,7 @@ cocos-studio-importer/
 ├─ lib/
 │  ├─ updater.js                    GitHub 检查、下载校验、备份与安装
 │  ├─ archive.js                    Node 标准库 ZIP 读写与路径/CRC 检查
+│  ├─ output-store.js               目标目录校验、文件与 .meta 对比、复用及冲突另存
 │  ├─ source.js                     CCS 扫描、路径校验、依赖预检、默认资源解析
 │  ├─ direct.js                     CSD → Prefab 与转换报告
 │  ├─ direct-assets.js              图片、图集、字体与 .meta
@@ -58,9 +59,9 @@ cocos-studio-importer/
 
 优先安装到项目：在「扩展 → 扩展管理器」的「项目」页导入发布 ZIP，然后启用扩展。官方[安装与分享说明](https://docs.cocos.com/creator/3.8/manual/zh/editor/extension/install.html)要求 ZIP 内直接包含扩展内容，本项目 ZIP 根目录直接放置 `package.json`。
 
-手动安装时，把 ZIP 内容放到 `<Creator工程>/extensions/cocos-studio-importer/`；不要把 `dist/cocos-studio-importer-0.3.0` 整层再套进同名文件夹。重新打开工程或在管理器中重新扫描、启用。安装后菜单位置为「文件 → 导入 Cocos Studio 工程」。
+手动安装时，把 ZIP 内容放到 `<Creator工程>/extensions/cocos-studio-importer/`；不要把 `dist/cocos-studio-importer-0.4.0` 整层再套进同名文件夹。重新打开工程或在管理器中重新扫描、启用。安装后菜单位置为「文件 → 导入 Cocos Studio 工程」。
 
-升级前等待导入任务完成，备份旧扩展到工程外，再替换或使用扩展管理器更新。导入生成的 `assets/studio_*` 与扩展代码目录分开；卸载扩展不会由本工具主动删除这些输出。输出资源只使用 Creator 原生组件，不需要本导入器作为游戏运行时依赖。
+升级前等待导入任务完成，备份旧扩展到工程外，再替换或使用扩展管理器更新。导入生成的指定 assets 子目录 与扩展代码目录分开；卸载扩展不会由本工具主动删除这些输出。输出资源只使用 Creator 原生组件，不需要本导入器作为游戏运行时依赖。
 
 ## 运行边界与生命周期
 
@@ -69,7 +70,7 @@ panel.js → Editor.Message.request → main.js → Worker(direct-worker.js)
                                                ↓
                                       source / direct / direct-assets
                                                ↓
-                                  写入 assets/studio_<唯一标识>
+                                  检查已有资源 → 写入 assets/<指定目录>
                                                ↓
 main.js ← Worker 结果 → asset-db / refresh-asset → status → panel.js
 
@@ -91,9 +92,9 @@ cli.js ────────────────────────�
 | 消息 | 参数 | 返回/行为 |
 | --- | --- | --- |
 | `open` | 无 | 打开默认面板，无业务返回值 |
-| `defaults` | 无 | `{ project: 当前工程绝对路径, mode: 'direct' }` |
+| `defaults` | 无 | `{ project: 当前工程绝对路径, mode: 'direct', folder: 'studio' }` |
 | `scan` | `.ccs` 路径字符串 | `{ ccs, resourceRoot, name, version, projects, resourceEntries }`；单个 project 为 `{ path, type, exists }` |
-| `start` | `{ ccs, selection: string[] }` | 非空选择列表；立即返回当前状态，随后后台执行，不是最终转换结果 |
+| `start` | `{ ccs, selection: string[], folder?: string }` | folder 为 assets 下的相对目录，默认 studio，可填 UI/Studio；非空选择列表，后台转换并复用已有相同资源 |
 | `status` | 无 | 当前状态对象；按阶段带有 `message/current/total/file/reportPath/error/missing` 等可选字段 |
 
 ```javascript
@@ -101,7 +102,7 @@ cli.js ────────────────────────�
 const source = await Editor.Message.request('cocos-studio-importer', 'scan', ccsPath);
 const selection = source.projects.filter(p => p.exists).slice(0, 1).map(p => p.path);
 if (!selection.length) throw new Error('没有可导入的 CSD');
-await Editor.Message.request('cocos-studio-importer', 'start', { ccs: ccsPath, selection });
+await Editor.Message.request('cocos-studio-importer', 'start', { ccs: ccsPath, selection, folder: 'UI/Studio' });
 while (true) {
   const state = await Editor.Message.request('cocos-studio-importer', 'status');
   if (state.phase === 'failed') throw new Error(state.error);
@@ -113,7 +114,7 @@ while (true) {
 }
 ```
 
-状态通常依次为 `idle → planning → converting → importing → complete/complete-with-warnings`；任一阶段可进入 `failed`。`reportPath` 仅在已有报告时可用。资源缺失发生在创建输出前，错误中携带 `missing`，不保证有报告文件。
+状态通常依次为 `idle → planning → indexing → converting → importing → complete/complete-with-warnings`；任一阶段可进入 `failed`。indexing 检查指定目录的内容和 .meta；复用资源不重写原文件。`reportPath` 仅在已有报告时可用。资源缺失发生在写入前，错误中携带 `missing`，不保证有报告文件。
 
 ## 增加控件转换
 

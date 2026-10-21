@@ -5,7 +5,7 @@ const {scan,plan}=require('./lib/source');
 const {convert}=require('./lib/direct');
 function main(args){
  const command=args.shift();
- if(!command||command==='--help'){console.log('node cli.js scan <project.ccs>\nnode cli.js plan <project.ccs> [CSD ...]\nnode cli.js convert <project.ccs> <new-output-directory> [CSD ...]\nnode cli.js assets <project.ccs> <new-assets-directory> [CSD ...]\nnode cli.js package\nconvert 生成 Creator 3.8 工程；assets 仅生成资源目录。无需安装 Creator 2.x 或旧迁移扩展。');return;}
+ if(!command||command==='--help'){console.log('node cli.js scan <project.ccs>\nnode cli.js plan <project.ccs> [CSD ...]\nnode cli.js convert <project.ccs> <new-output-directory> [CSD ...]\nnode cli.js assets <project.ccs> <assets-directory> [CSD ...]\nnode cli.js package\nconvert 生成 Creator 3.8 工程；assets 支持已有目录，完全相同的资源复用原文件与 UUID，内容不同则另存。无需安装 Creator 2.x 或旧迁移扩展。');return;}
  if(command==='package'){
   const dest=path.join(__dirname,'dist/cocos-studio-importer-'+require('./package.json').version);
   if(fs.existsSync(dest))throw new Error('打包目录已存在：'+dest);

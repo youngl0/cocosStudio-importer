@@ -1,13 +1,14 @@
 'use strict';
-const path=require('path'),crypto=require('crypto');
+const path=require('path');
 const {Worker}=require('worker_threads');
 const {scan}=require('./lib/source');
+const {importTarget}=require('./lib/output-store');
 const updater=require('./lib/updater'),manifest=require('./package.json');
 let current={phase:'idle'},running=false,updateBusy=false,release=null;
 let updateState={phase:'idle',current:manifest.version,repo:updater.repository(manifest.repository.url)};
 exports.methods={
  open(){Editor.Panel.open('cocos-studio-importer');},
- defaults(){return {project:Editor.Project.path,mode:'direct'};},
+ defaults(){return {project:Editor.Project.path,mode:'direct',folder:'studio'};},
  scan(ccs){return scan(ccs);},status(){return current;},
  'update-status'(){return {...updateState,importing:running};},
  async 'check-update'(){
@@ -33,9 +34,8 @@ exports.methods={
   if(updateBusy||updateState.phase==='restart-required')throw new Error('更新处理中或等待重新加载扩展，请完成后再导入');
   if(running)throw new Error('已有转换任务正在执行');
   if(!options.selection?.length)throw new Error('请至少选择一个 CSD');
-  running=true;current={phase:'planning',message:'直接转换 Cocos Studio 资源…'};
-  const folder='studio_'+Date.now()+'_'+crypto.randomBytes(3).toString('hex');
-  const output=path.join(Editor.Project.path,'assets',folder);
+  const {folder,output}=importTarget(Editor.Project.path,options.folder);
+  running=true;current={phase:'planning',message:'直接转换 Cocos Studio 资源…',output};
   const worker=new Worker(path.join(__dirname,'lib/direct-worker.js'),{workerData:{ccs:options.ccs,selection:options.selection,output}});
   let settled=false;
   worker.on('message',async message=>{
@@ -44,7 +44,7 @@ exports.methods={
    if(message.kind==='result'){
     settled=true;const report=message.value;
     current={phase:'importing',message:'转换完成，Creator 正在导入资源',reportPath:report.reportPath};
-    try{await Editor.Message.request('asset-db','refresh-asset','db://assets/'+folder);current={phase:report.phase,reportPath:report.reportPath,message:'已生成 '+report.prefabs.length+' 个 Prefab；'+report.warnings.length+' 项提示，详见报告'};}
+    try{await Editor.Message.request('asset-db','refresh-asset','db://assets/'+folder);current={phase:report.phase,output,reportPath:report.reportPath,message:'已处理 '+report.prefabs.length+' 个 Prefab；新增 '+report.createdResources+' 项资源，复用 '+report.reusedResources+' 项；'+report.warnings.length+' 项提示，详见报告'};}
     catch(e){current={...current,phase:'failed',error:e.stack};}finally{running=false;}
    }
   });

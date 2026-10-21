@@ -92,14 +92,14 @@ test('default resolver handles short names, missing project Default paths and tr
  for(const p of ['../outside.png','Default/../outside.png','Default/../../outside.png','C:/outside.png'])assert.throws(()=>resolveImportResource(f.resources,p,'Default'),/路径/);
 });
 test('preserves image names and source directories, reuses identical frames and separates slices',t=>{
- const f=fixture(t);for(const p of ['ui/button.png','icons/button.png'])f.write(p,fs.readFileSync(path.join(defaultRoot,'Sprite.png')));
+ const f=fixture(t);f.write('ui/button.png',fs.readFileSync(path.join(defaultRoot,'Sprite.png')));f.write('icons/button.png',fs.readFileSync(path.join(defaultRoot,'Button_Normal.png')));
  const report={warnings:[]},a=new Assets(f.resources,f.output,'test',report),data=p=>({getAttribute:k=>k==='Path'?p:''});
  const one=a.frame(data('ui/button.png')),same=a.frame(data('ui/button.png')),sliced=a.frame(data('ui/button.png'),[1,1,1,1]),other=a.frame(data('icons/button.png'));
  assert.deepEqual(one,same);assert.notEqual(one.__uuid__,sliced.__uuid__);assert.notEqual(one.__uuid__,other.__uuid__);assert.equal(report.images.length,3);
  assert.equal(path.relative(f.output,report.images[0].file).replace(/\\/g,'/'),'frames/project/images/ui/button.png');
  assert.equal(path.relative(f.output,report.images[2].file).replace(/\\/g,'/'),'frames/project/images/icons/button.png');
  assert.match(path.basename(report.images[1].file),/^button__[a-f0-9]{8}\.png$/);
- for(const item of report.images)assert.deepEqual(fs.readFileSync(item.file),fs.readFileSync(path.join(defaultRoot,'Sprite.png')));
+ for(const item of report.images)assert.deepEqual(fs.readFileSync(item.file),fs.readFileSync(path.join(f.resources,item.source)));
 });
 test('generated suffixes cannot overwrite an existing source-name collision',t=>{
  const f=fixture(t),a=new Assets(f.resources,f.output,'test',{warnings:[]});

@@ -1,4 +1,4 @@
-# Cocos Studio → Creator 3.8 独立导入器 0.3.0
+# Cocos Studio → Creator 3.8 独立导入器 0.4.0
 
 直接读取 .ccs / .csd / 图片，生成 Creator 3.8 原生 Prefab 和 .meta。转换核心用 Node.js 编写；XML 解析器 @xmldom/xmldom 0.9.12 以未修改的源码附带在 vendor/xmldom，保留 MIT 许可证；运行时无 npm 依赖。另内置用户提供的 Cocos Studio Default 原始资源。
 
@@ -26,13 +26,13 @@
 
 ## 作为 Creator 3.8 扩展使用
 
-1. 在扩展管理器中选择「项目」，导入 dist/cocos-studio-importer-0.3.0.zip。ZIP 根目录直接包含 package.json。
+1. 在扩展管理器中选择「项目」，导入 dist/cocos-studio-importer-0.4.0.zip。ZIP 根目录直接包含 package.json。
 2. 如果已经安装旧版本，替换同名扩展并重新加载，然后确认已启用。
 3. 在「文件 → 导入 Cocos Studio 工程」打开面板。
 4. 选择 .ccs，扫描并勾选需要的 CSD，点击「导入所选界面」。
-5. 资源生成在 assets/studio_时间戳_随机值。打开报告目录查看 studio-import-report.json，Prefab 位于 prefabs 子目录。
+5. 填写导入目录（相对于 assets，默认 studio，可填 UI/Studio），点击导入。资源生成在指定目录；可使用已有目录。打开报告目录查看本次报告，Prefab 位于 prefabs 子目录。
 
-每次导入生成新目录与独立 UUID，不覆盖原资产。业务脚本及事件绑定需在 Creator 中接入。
+完全相同的资源复用已有文件和 UUID；同名但内容不同的资源使用后缀另存，保留旧文件与 .meta。业务脚本及事件绑定需在 Creator 中接入。
 
 ## 编辑器内更新
 
@@ -46,7 +46,7 @@
 
 ## 独立命令行使用
 
-需要 Node.js 18 或更新版本，发布包不需要 npm install。下列命令在解压后的工具目录运行；输出目录必须尚不存在。
+需要 Node.js 18 或更新版本，发布包不需要 npm install。下列命令在解压后的工具目录运行。convert 创建新工程，输出目录必须不存在；assets 可以导入已有目录并复用相同资源。
 
 ```powershell
 node cli.js scan "D:\StudioProject\demo.ccs"
@@ -69,13 +69,15 @@ CSD 名称可连续指定多个；省略则处理 CCS 登记的全部 CSD。嵌�
 工具 resources/Default 已包含从 C:\Cocos Studio\EditorDefaultRes\Default 复制的 49 个原始文件，资源清单与 SHA-256 记录在 resources/default-resources.json。使用时无需原 Cocos Studio 安装目录。
 
 - Type="Default" 的引用从内置库读取，支持 Default/Sprite.png、反斜杠路径及 Sprite.png 短路径。
-- 普通引用优先读取工程资源；只有工程中不存在的 Default/... 路径才回退到内置库。同名工程图片和默认图片不会共用 UUID。
+- 普通引用优先读取工程资源；只有工程中不存在的 Default/... 路径才回退到内置库。来源保持区分；只有内容和导入设置完全相同时才会复用已有资源。
 - 转换前扫描默认资源依赖，按需复制到输出的 resources/studio-default/Default；不会把整个默认库放进目标工程。图片帧继续按帧/边距组合生成在 frames 下。
 - 自动包含 FNT 图片页、plist 纹理、TMX/TSX 图片及 ExportJson 声明的图集/图片依赖；带嵌入纹理的粒子 plist 不要求额外纹理文件。
 - 默认图片进入正常 Sprite / Button / Toggle 转换，TTF/OTF 可用于 Label。不存在的默认引用会报告 CSD 来源并停止转换。
 - 报告 defaultResources 字段列出复制的默认资源，images.origin 标识 default / project / generated。
 
 ## 图片命名（0.2.3）
+
+0.4.0 起可指定目标目录并复用已有资源，规则见下节；发生复用时，保留已有文件的路径和 UUID。
 
 普通图片保留源文件名与相对目录。例如 gImage3/global_panel5_panelbg.png 输出到 frames/project/images/gImage3/global_panel5_panelbg.png。默认资源放在 frames/default/images/Default，工具生成的图片放在 frames/generated/images，避免与工程图片冲突。
 
@@ -84,6 +86,18 @@ CSD 名称可连续指定多个；省略则处理 CCS 登记的全部 CSD。嵌�
 图集图片以帧名命名，放在 frames/来源/atlases/图集相对路径/帧名 下；实际文件仍是图集纹理副本，由 .meta 指定裁切区域。扩展名与实际纹理格式一致。不适合 Windows 文件名的图集帧字符会替换并写入报告。
 
 新版命名仅对重新导入生效，原导入目录不改名；报告 images 记录源图片、输出路径和 UUID 的对应关系。
+
+## 指定目录与资源复用（0.4.0）
+
+导入目录相对于当前工程的 assets，例如 `studio`、`UI/Login`。同一目录可以连续导入多个 CSD，不再强制生成时间戳文件夹。检查范围是所选目录及其子目录，目录外的资源不会参与复用。
+
+- 图片先核对文件字节，再比较裁切、旋转、原尺寸、偏移、九宫格、过滤、平铺等导入设置；全部一致才复用已有文件和 SpriteFrame UUID。同图不同设置保留为独立资源。
+- 字体核对文件与字体导入设置。Prefab 比较完整序列化内容和资源引用；完全一致时保留原 Prefab UUID。
+- 名称不同但内容和设置相同，也可以复用。复用时保留已有资源的名字与位置，不再生成副本。
+- 同名但内容不同、缺少有效 .meta 或设置不兼容时，加后缀另存；保留已有文件、修改内容及 .meta，不覆盖。
+- 每次生成独立的 `studio-import-report*.json`，包含 `createdResources`、`reusedResources` 和逐项 `resources`，旧报告保留。
+
+Creator 自动生成的 imported、缓存文件列表、图片顶点等派生信息不作为差异；手工修改的纹理或九宫格设置会作为差异保留。复用依赖目标文件及其 .meta，不能只凭同名判断。CLI 的 `assets` 命令使用同一套规则；`convert` 创建新工程时仍要求输出目录不存在。
 
 ## 当前转换范围
 
@@ -124,7 +138,7 @@ npm test
 node cli.js package
 ```
 
-若 Node 24 在受限环境无法创建测试子进程，可运行 node --test --test-isolation=none test/direct.test.js。
+若 Node 24 在受限环境无法创建测试子进程，可运行 node --test --test-isolation=none test/direct.test.js test/updater.test.js test/reuse.test.js。
 
 官方规范参考：[扩展包定义](https://docs.cocos.com/creator/3.8/manual/zh/editor/extension/define.html)、[面板系统](https://docs.cocos.com/creator/3.8/manual/zh/editor/extension/panel.html)、[消息定义](https://docs.cocos.com/creator/3.8/manual/zh/editor/extension/contributions-messages.html)、[安装与分享](https://docs.cocos.com/creator/3.8/manual/zh/editor/extension/install.html)。
 

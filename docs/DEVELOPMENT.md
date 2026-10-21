@@ -15,13 +15,13 @@ npm run check
 npm test
 ```
 
-`check` 实际执行 `node cli.js --help`；`test` 执行 `node --test test/direct.test.js`。二者不启动 Creator。若受限执行环境不允许测试器创建子进程，已安装的 Node 24 可使用：
+`check` 实际执行 `node cli.js --help`；`test` 执行 direct、updater、reuse 三组回归测试。二者不启动 Creator。若受限执行环境不允许测试器创建子进程，已安装的 Node 24 可使用：
 
 ```powershell
-node --test --test-isolation=none test/direct.test.js
+node --test --test-isolation=none test/direct.test.js test/updater.test.js test/reuse.test.js
 ```
 
-回归测试覆盖坐标换算、缺失资源、目录越界、循环嵌套、图集矩形、对象/UUID 引用、原生控件引用、默认资源与依赖、图片命名和同名冲突。它们不替代 Creator 的渲染与交互验收。
+回归测试覆盖坐标换算、缺失资源、目录越界、循环嵌套、图集矩形、对象/UUID 引用、原生控件引用、默认资源与依赖、图片命名和同名冲突、指定目录、连续导入、UUID 保留和修改内容保护。它们不替代 Creator 的渲染与交互验收。
 
 修改控件序列化或资源 .meta 后，应在独立 Creator 3.8.8 工程中检查：资源库导入、Prefab 加载和实例化、缺失脚本/图片、实际交互。修改 ZIP 分发方式时，应通过扩展管理器安装测试，不能只用复制目录代替。
 
@@ -55,7 +55,7 @@ Compress-Archive -Path "dist/cocos-studio-importer-$version/*" -DestinationPath 
 | Cannot find vendor/... | 分发不完整或目录层级错误；重新完整解压，核对 vendor/xmldom/lib 与许可证 |
 | 已有任务正在执行 | 等待任务结束；关闭面板不会取消 Worker |
 | 缺少资源、未生成输出 | 使用 plan 查 missing 和 from；同时检查内置 Default 文件是否齐全 |
-| 输出目录必须不存在 | 使用新的目录；工具不提供覆盖参数 |
+| 输出目录必须不存在 | CLI convert 或 Node project:true 创建新工程仍要求新目录；assets 模式可使用已有目录并复用相同资源，不覆盖不同内容 |
 | 有图片但位置/行为不同 | 检查 warnings；ListView 排列、动画、特殊控件和部分适配规则未完整转换 |
 | LabelOutline.color / LabelShadow 弃用警告 | 更新到 0.2.5 或以后版本并重新导入 CSD，使用新 prefab。旧 prefab 不会随扩展升级自动迁移；已有手工修改应先备份并对照合并 |
 | CLI 中 Editor is not defined | 不应直接运行 main.js/panel.js；改用 cli.js 或 lib/direct.js |

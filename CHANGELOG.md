@@ -1,5 +1,12 @@
 # 更新记录
 
+## 0.4.0
+
+- 导入面板支持指定 assets 下的目标目录及多级目录，默认 studio，可重复导入已有目录。
+- 扫描目标目录：图片字节及裁切、九宫格、纹理设置一致时复用现有资源与 UUID；字体、原始资源和 Prefab 同样支持复用。
+- 同名但内容不同的资源加后缀另存，保留已有文件与 .meta；避免重复 UUID。每次生成独立报告，记录新增和复用数量。
+- CLI assets 与 Node API 同步支持导入已有目录；CLI convert 仍要求创建新工程。
+
 ## 0.3.0
 
 - 发布到 youngl0/cocosStudio-importer；增加 GitHub Actions 自动测试、打包及标签触发的 Release 发布。
