@@ -1,6 +1,6 @@
 # Creator 3.8 扩展开发说明
 
-适用版本：扩展 0.4.2，目标 Creator 3.8.2–3.8.x；实际编辑器验证版本为 Windows Creator 3.8.8。其他 3.8 补丁版本尚未逐一验证。本项目直接分发 CommonJS JavaScript，不需要 TypeScript 编译。
+适用版本：扩展 0.4.3，目标 Creator 3.8.2–3.8.x；实际编辑器验证版本为 Windows Creator 3.8.8。其他 3.8 补丁版本尚未逐一验证。本项目直接分发 CommonJS JavaScript，不需要 TypeScript 编译。
 
 ## 扩展定义与入口
 
@@ -10,7 +10,7 @@ Creator 通过 `package.json` 识别扩展的入口、面板和贡献功能。�
 | --- | --- | --- |
 | `name` | `cocos-studio-importer` | 扩展标识；安装目录使用同名 |
 | `package_version` | `2` | 保持 Creator 扩展包格式设置，不随补丁版本增加 |
-| `version` | `0.4.2` | 本工具发布版本 |
+| `version` | `0.4.3` | 本工具发布版本 |
 | `title` | `Cocos Studio 导入器` | 扩展管理器显示名称 |
 | `description` / `author` | 见根目录清单 | 功能描述与作者信息 |
 | `editor` | `>=3.8.2 <3.9.0` | 限定目标编辑器版本范围；不代表所有补丁版本已测试 |
@@ -59,7 +59,7 @@ cocos-studio-importer/
 
 优先安装到项目：在「扩展 → 扩展管理器」的「项目」页导入发布 ZIP，然后启用扩展。官方[安装与分享说明](https://docs.cocos.com/creator/3.8/manual/zh/editor/extension/install.html)要求 ZIP 内直接包含扩展内容，本项目 ZIP 根目录直接放置 `package.json`。
 
-手动安装时，把 ZIP 内容放到 `<Creator工程>/extensions/cocos-studio-importer/`；不要把 `dist/cocos-studio-importer-0.4.2` 整层再套进同名文件夹。重新打开工程或在管理器中重新扫描、启用。安装后菜单位置为「文件 → 导入 Cocos Studio 工程」。
+手动安装时，把 ZIP 内容放到 `<Creator工程>/extensions/cocos-studio-importer/`；不要把 `dist/cocos-studio-importer-0.4.3` 整层再套进同名文件夹。重新打开工程或在管理器中重新扫描、启用。安装后菜单位置为「文件 → 导入 Cocos Studio 工程」。
 
 升级前等待导入任务完成，备份旧扩展到工程外，再替换或使用扩展管理器更新。导入生成的指定 assets 子目录 与扩展代码目录分开；卸载扩展不会由本工具主动删除这些输出。输出资源只使用 Creator 原生组件，不需要本导入器作为游戏运行时依赖。
 

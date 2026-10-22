@@ -1,4 +1,4 @@
-# Cocos Studio → Creator 3.8 独立导入器 0.4.2
+# Cocos Studio → Creator 3.8 独立导入器 0.4.3
 
 直接读取 .ccs / .csd / 图片，生成 Creator 3.8 原生 Prefab 和 .meta。转换核心用 Node.js 编写；XML 解析器 @xmldom/xmldom 0.9.12 以未修改的源码附带在 vendor/xmldom，保留 MIT 许可证；运行时无 npm 依赖。另内置用户提供的 Cocos Studio Default 原始资源。
 
@@ -26,10 +26,10 @@
 
 ## 作为 Creator 3.8 扩展使用
 
-1. 在扩展管理器中选择「项目」，导入 dist/cocos-studio-importer-0.4.2.zip。ZIP 根目录直接包含 package.json。
+1. 在扩展管理器中选择「项目」，导入 dist/cocos-studio-importer-0.4.3.zip。ZIP 根目录直接包含 package.json。
 2. 如果已经安装旧版本，替换同名扩展并重新加载，然后确认已启用。
 3. 在「文件 → 导入 Cocos Studio 工程」打开面板。
-4. 选择 .ccs，扫描并勾选需要的 CSD，点击「导入所选界面」。
+4. 选择 .ccs 并扫描。可逐项勾选 CSD、点击「选择全部」选中所有存在的 CSD，或点击「选择筛选结果」只添加当前筛选匹配项；缺失文件不会选中。
 5. 填写导入目录（相对于 assets，默认 studio，可填 UI/Studio），点击导入。资源生成在指定目录；可使用已有目录。打开报告目录查看本次报告，Prefab 位于 prefabs 子目录。
 
 完全相同的资源复用已有文件和 UUID；同名但内容不同的资源使用后缀另存，保留旧文件与 .meta。业务脚本及事件绑定需在 Creator 中接入。

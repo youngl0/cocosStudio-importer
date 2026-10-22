@@ -1,5 +1,10 @@
 # 更新记录
 
+## 0.4.3
+
+- 导入面板增加独立的「选择全部」按钮，选中扫描结果中所有存在的 CSD，不受当前筛选条件影响。
+- 保留「选择筛选结果」及「清空选择」；导入期间禁用选择操作，没有可选项时禁用相应按钮。
+
 ## 0.4.2
 
 - 修复普通 Cocos Studio 默认图片被复制到 resources/studio-default/Default 与 frames/default/images/Default 两处的问题；同一图片直接在保留文件上生成纹理和 SpriteFrame 元数据。

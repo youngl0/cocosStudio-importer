@@ -15,7 +15,7 @@ exports.template = `
   <label>.ccs 工程</label><input id="ccs" type="text" placeholder="选择 Cocos Studio 工程文件"/>
   <button id="browse">选择工程</button><button id="scan">扫描界面</button>
   <label>界面筛选</label><input id="filter" type="text" placeholder="按 CSD 名称筛选"/>
-  <button id="all">选择筛选结果</button><button id="none">清空选择</button><small id="count">尚未扫描</small>
+  <button id="all" title="选中所有存在的 CSD，不受筛选条件影响">选择全部</button><button id="filtered">选择筛选结果</button><button id="none">清空选择</button><small id="count">尚未扫描</small>
   <div id="list"></div>
   <label>导入目录（相对于 assets）</label><input id="folder" type="text" value="studio" placeholder="例如 UI/Studio"/>
   <small>可使用已有目录。文件内容和导入设置完全相同时，复用原资源及 UUID；内容不同则另存。</small><br/>
@@ -28,7 +28,7 @@ exports.template = `
     <details><summary>更新说明</summary><pre id="release-notes"></pre></details>
   </div>
 `;
-exports.$ = Object.fromEntries(['ccs','browse','scan','filter','all','none','count','list','start','report','status','folder','version','check-update','install-update','release-page','update-status','release-notes'].map(id => [id, '#' + id]));
+exports.$ = Object.fromEntries(['ccs','browse','scan','filter','all','filtered','none','count','list','start','report','status','folder','version','check-update','install-update','release-page','update-status','release-notes'].map(id => [id, '#' + id]));
 exports.ready = async function () {
   const panel = this;
   let projects = [], selection = new Set(), busy = false, updateBlocked=false, reportPath;
@@ -46,7 +46,12 @@ exports.ready = async function () {
     }
     updateCount();
   };
-  function updateCount() { panel.$.count.textContent = `${selection.size} / ${projects.length} 已选`; panel.$.start.disabled = busy || updateBlocked || selection.size === 0; }
+  function updateCount() {
+    panel.$.count.textContent = `${selection.size} / ${projects.length} 已选`; panel.$.start.disabled = busy || updateBlocked || selection.size === 0;
+    panel.$.all.disabled = busy || !projects.some(p => p.exists);
+    panel.$.filtered.disabled = busy || !projects.some(p => p.exists && p.path.toLowerCase().includes(panel.$.filter.value.toLowerCase()));
+    panel.$.none.disabled = busy || selection.size === 0;
+  }
   const showUpdate=state=>{
     const active=['checking','downloading','verifying','installing'].includes(state.phase);
     updateBlocked=active||state.phase==='restart-required';updateCount();
@@ -77,8 +82,9 @@ exports.ready = async function () {
   });
   panel.$.scan.addEventListener('click', doScan);
   panel.$.filter.addEventListener('input', render);
-  panel.$.all.addEventListener('click', () => { for (const p of projects) if (p.exists && p.path.toLowerCase().includes(panel.$.filter.value.toLowerCase())) selection.add(p.path); render(); });
-  panel.$.none.addEventListener('click', () => { selection.clear(); render(); });
+  panel.$.all.addEventListener('click', () => { if (busy) return; for (const p of projects) if (p.exists) selection.add(p.path); render(); });
+  panel.$.filtered.addEventListener('click', () => { if (busy) return; for (const p of projects) if (p.exists && p.path.toLowerCase().includes(panel.$.filter.value.toLowerCase())) selection.add(p.path); render(); });
+  panel.$.none.addEventListener('click', () => { if (busy) return; selection.clear(); render(); });
   panel.$.start.addEventListener('click', async () => {
     busy = true; render();
     try { await request('start', { ccs: panel.$.ccs.value, selection: [...selection],folder:panel.$.folder.value }); }
@@ -92,7 +98,7 @@ exports.ready = async function () {
       if (state.phase === 'idle') return;
       const active = !['complete','complete-with-warnings','failed'].includes(state.phase);
       if (busy !== active) { busy = active; render(); }
-      for (const id of ['browse','scan','all','none','folder']) panel.$[id].disabled = busy;
+      for (const id of ['browse','scan','folder']) panel.$[id].disabled = busy;
       reportPath = state.reportPath; panel.$.report.disabled = !reportPath;
       panel.$.status.textContent = [state.phase, state.detail, state.current && `${state.current}/${state.total}`, state.file, state.message, state.error, reportPath && `报告：${reportPath}`].filter(Boolean).join('\n');
     } catch (e) { showError(e); }
